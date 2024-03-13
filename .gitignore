@@ -25,7 +25,7 @@ experiment.py
 /ui-config.json
 /outputs
 /config.json
-/log
+*.log
 /webui.settings.bat
 /embeddings
 /styles.csv
@@ -52,3 +52,4 @@ experiment.py
 /auth.json
 .cog/
 *.db
+models

@@ -56,6 +56,7 @@ img_generate_responses = {
 
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=False)
 
+
 def api_key_auth(apikey: str = Security(api_key_header)):
     """
     Check if the API key is valid, API key is not required if no API key is set
@@ -139,7 +140,7 @@ def req_to_params(req: Text2ImgRequest) -> ImageGenerationParams:
     # parse inpaint params
     inpaint_input_image = None
     inpaint_additional_prompt = None
-    if isinstance(req, (ImgInpaintOrOutpaintRequest, ImgInpaintOrOutpaintRequestJson)):
+    if isinstance(req, (ImgInpaintOrOutpaintRequest, ImgInpaintOrOutpaintRequestJson)) and req.input_image is not None:
         inpaint_additional_prompt = req.inpaint_additional_prompt
         input_image = read_input_image(req.input_image)
         input_mask = read_input_image(req.input_mask)
@@ -154,7 +155,7 @@ def req_to_params(req: Text2ImgRequest) -> ImageGenerationParams:
                         ImgPromptRequestJson, ImgUpscaleOrVaryRequestJson,
                         Text2ImgRequestWithPrompt)):
         # Auto set mixing_image_prompt_and_inpaint to True
-        if len(req.image_prompts) > 0 and req.uov_input_image is not None:
+        if len(req.image_prompts) > 0 and uov_input_image is not None:
             print("[INFO] Mixing image prompt and vary upscale is set to True")
             req.advanced_params.mixing_image_prompt_and_vary_upscale = True
         elif len(req.image_prompts) > 0 and not isinstance(req, Text2ImgRequestWithPrompt) and req.input_image is not None:

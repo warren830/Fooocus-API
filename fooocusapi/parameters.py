@@ -19,45 +19,13 @@ default_prompt_negative = config.default_prompt_negative
 default_sampler = config.default_sampler
 default_scheduler = config.default_scheduler
 
-
 default_aspect_ratio = get_aspect_ratio_value(config.default_aspect_ratio)
 available_aspect_ratios = [get_aspect_ratio_value(a) for a in config.available_aspect_ratios]
-
-
-available_aspect_ratios = [
-    '704*1408',
-    '704*1344',
-    '768*1344',
-    '768*1280',
-    '832*1216',
-    '832*1152',
-    '896*1152',
-    '896*1088',
-    '960*1088',
-    '960*1024',
-    '1024*1024',
-    '1024*960',
-    '1088*960',
-    '1088*896',
-    '1152*896',
-    '1152*832',
-    '1216*832',
-    '1280*768',
-    '1344*768',
-    '1344*704',
-    '1408*704',
-    '1472*704',
-    '1536*640',
-    '1600*640',
-    '1664*576',
-    '1728*576',
-]
 
 uov_methods = [
     'Disabled', 'Vary (Subtle)', 'Vary (Strong)', 'Upscale (1.5x)',
     'Upscale (2x)', 'Upscale (Fast 2x)', 'Upscale (Custom)'
 ]
-
 
 outpaint_expansions = [
     'Left', 'Right', 'Top', 'Bottom'
@@ -66,6 +34,7 @@ outpaint_expansions = [
 
 class ImageGenerationParams:
     """Parameters for image generation"""
+
     def __init__(self, prompt: str,
                  negative_prompt: str,
                  style_selections: List[str],
@@ -151,7 +120,6 @@ class ImageGenerationParams:
             inpaint_mask_upload_checkbox = False
             invert_mask_checkbox = False
             inpaint_erode_or_dilate = 0
-
 
             # Auto set mixing_image_prompt_and_inpaint to True
             if len(self.image_prompts) > 0 and inpaint_input_image is not None:

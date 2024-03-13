@@ -48,12 +48,13 @@ class TaskObj:
 
     async def pre_task(self):
         """pre task"""
-        setattr(self, "req_param", pre_task(self.req_param))
+        setattr(self, "req_param", await pre_task(self.req_param))
 
     async def run(self):
         """start running task"""
         self.update("status", "running")
         self.update("task_type", get_task_type(self.req_param))
+        self.update("start_millis", int(time.time()*1000))
         params = req_to_params(self.req_param)
         sem = threading.Semaphore()
         try:
@@ -63,8 +64,8 @@ class TaskObj:
                 await future
         finally:
             sem.release()
-        # await process_generate(self, params)
         self.update("status", "completed")
+        self.update("finish_millis", int(time.time()*1000))
 
     async def stop(self):
         """stop running task"""
@@ -74,7 +75,7 @@ class TaskObj:
 
     async def post_task(self):
         """post task"""
-        post_task(self.to_dict())
+        await post_task(self.__dict__)
 
     def to_dict(self):
         """
@@ -83,6 +84,13 @@ class TaskObj:
         :return: Dict for this object
         """
         obj_dict = copy.deepcopy(self.__dict__)
+
+        # Remove unwanted keys
+        try:
+            obj_dict['req_param'].input_image = None
+            obj_dict['req_param'].input_mask = None
+        except:
+            pass
 
         # Convert Enum obj to value
         try:

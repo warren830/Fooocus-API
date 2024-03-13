@@ -15,7 +15,6 @@ from fooocusapi.utils.tools import (is_installed,
                                     run_pip,
                                     check_torch_cuda)
 
-
 PATTERN = re.compile(r"\s*([-_a-zA-Z0-9]+)\s*(?:==\s*([-+_.a-zA-Z0-9]+))?\s*")
 
 
@@ -85,13 +84,14 @@ def download_models():
     """
     Downloads the models.
     """
-    from modules.config import (path_checkpoints as modelfile_path,
-                            path_loras as lorafile_path,
-                            path_vae_approx as vae_approx_path,
-                            path_fooocus_expansion as fooocus_expansion_path,
-                            checkpoint_downloads,
-                            path_embeddings as embeddings_path,
-                            embeddings_downloads, lora_downloads)
+    from modules.config import (
+        path_checkpoints as modelfile_path,
+        path_loras as lorafile_path,
+        path_vae_approx as vae_approx_path,
+        path_fooocus_expansion as fooocus_expansion_path,
+        checkpoint_downloads,
+        path_embeddings as embeddings_path,
+        embeddings_downloads, lora_downloads)
     uri = 'https://huggingface.co/lllyasviel/misc/resolve/main/'
     vae_approx_filenames = [
         ('xlvaeapp.pth', f'{uri}xlvaeapp.pth'),
@@ -149,7 +149,7 @@ def prepare_environments(args, module_path, script_path) -> bool:
     return True
 
 
-def preplaod_pipeline():
-    "Preload pipeline"
+def preload_pipeline():
+    """Preload pipeline"""
     print("Preload pipeline")
     import modules.default_pipeline as _

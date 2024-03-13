@@ -1,4 +1,4 @@
-"""Common modell for requests"""
+"""Common model for requests"""
 from enum import Enum
 
 from pydantic import BaseModel, Field

@@ -9,6 +9,7 @@ from fooocusapi.models.common.base import (
     UpscaleOrVaryMethod
 )
 
+
 class ImagePromptJson(BaseModel):
     """Image prompt"""
     cn_img: str | None = Field(None,

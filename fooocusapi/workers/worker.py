@@ -5,21 +5,13 @@ import numpy as np
 import torch
 
 import fooocus_version
-
 from extras import (preprocessors, ip_adapter, face_crop)
 from extras.expansion import safe_str
-from modules import core
-from modules.config import downloading_sdxl_lcm_lora
-from modules.private_logger import log
-from modules.upscaler import perform_upscale
-from modules.util import (
-    remove_empty_str,
-    resize_image,
-    set_image_shape_ceil,
-    get_image_shape_ceil,
-    get_shape_ceil
-)
 from fooocusapi.models.common.response import GeneratedImageResult
+from fooocusapi.parameters import ImageGenerationParams
+from fooocusapi.utils.file_utils import get_file_serve_url, save_output_file
+from fooocusapi.utils.img_utils import narray_to_base64img
+from fooocusapi.utils.logger import default_logger
 from fooocusapi.workers.utils import (
     check_aspect_ratios,
     refresh_seed,
@@ -29,13 +21,23 @@ from fooocusapi.workers.utils import (
     overwrite_by_ap,
     determine_task_type,
     process_uov,
-    process_inpaint,
     process_image_prompt,
     add_tasks)
-from fooocusapi.utils.file_utils import get_file_serve_url, save_output_file
-from fooocusapi.utils.img_utils import narray_to_base64img
-from fooocusapi.utils.logger import default_logger
-from fooocusapi.parameters import ImageGenerationParams
+from modules import core
+from modules.config import downloading_sdxl_lcm_lora
+from modules.config import (
+    downloading_upscale_model,
+    downloading_inpaint_models
+)
+from modules.private_logger import log
+from modules.upscaler import perform_upscale
+from modules.util import (
+    remove_empty_str,
+    resize_image,
+    set_image_shape_ceil,
+    get_image_shape_ceil,
+    get_shape_ceil, erode_or_dilate
+)
 
 
 def process_stop():
@@ -190,18 +192,46 @@ def process_generate(self, params: ImageGenerationParams):
                                                                    performance_selection, steps)
 
             if generate_type == 'inpaint':
-                inpaint_input_image, inpaint_mask, \
-                    controlnet_canny_path, controlnet_cpds_path, clip_vision_path, \
-                    ip_negative_path, ip_adapter_path, \
-                    ip_adapter_face_path = process_inpaint(
-                        inpaint_input_image, inpaint_mask_image_upload,
-                        outpaint_selections, inpaint_parameterized,
-                        inpaint_head_model_path, inpaint_patch_model_path,
-                        use_synthetic_refiner, refiner_switch,
-                        base_model_additional_loras, refiner_model_name,
-                        inpaint_additional_prompt, prompt,
-                        advanced_parameters
-                    )
+                inpaint_image = inpaint_input_image['image']
+                inpaint_mask = inpaint_input_image['mask'][:, :, 0]
+
+                if advanced_parameters.inpaint_mask_upload_checkbox:
+                    if isinstance(inpaint_mask_image_upload, np.ndarray):
+                        if inpaint_mask_image_upload.ndim == 3:
+                            H, W, C = inpaint_image.shape
+                            inpaint_mask_image_upload = resample_image(inpaint_mask_image_upload, width=W, height=H)
+                            inpaint_mask_image_upload = np.mean(inpaint_mask_image_upload, axis=2)
+                            inpaint_mask_image_upload = (inpaint_mask_image_upload > 127).astype(np.uint8) * 255
+                            inpaint_mask = inpaint_mask_image_upload
+
+                if int(advanced_parameters.inpaint_erode_or_dilate) != 0:
+                    inpaint_mask = erode_or_dilate(inpaint_mask, advanced_parameters.inpaint_erode_or_dilate)
+
+                if advanced_parameters.invert_mask_checkbox:
+                    inpaint_mask = 255 - inpaint_mask
+
+                inpaint_image = HWC3(inpaint_image)
+                if isinstance(inpaint_image, np.ndarray) and isinstance(inpaint_mask, np.ndarray) \
+                        and (np.any(inpaint_mask > 127) or len(outpaint_selections) > 0):
+                    downloading_upscale_model()
+                    if inpaint_parameterized:
+                        inpaint_head_model_path, inpaint_patch_model_path = downloading_inpaint_models(
+                            advanced_parameters.inpaint_engine)
+                        base_model_additional_loras += [(inpaint_patch_model_path, 1.0)]
+                        print(f'[Inpaint] Current inpaint model is {inpaint_patch_model_path}')
+                        if refiner_model_name == 'None':
+                            use_synthetic_refiner = True
+                            refiner_switch = 0.5
+                    else:
+                        inpaint_head_model_path, inpaint_patch_model_path = None, None
+                        print(f'[Inpaint] Parameterized inpaint is disabled.')
+                    if inpaint_additional_prompt != '':
+                        if prompt == '':
+                            prompt = inpaint_additional_prompt
+                        else:
+                            prompt = inpaint_additional_prompt + '\n' + prompt
+                    goals.append('inpaint')
+
             if generate_type == 'ip':
                 goals.append('cn')
                 controlnet_canny_path, controlnet_cpds_path, clip_vision_path, \

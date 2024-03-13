@@ -128,7 +128,7 @@ class AdvancedParams(BaseModel):
     mixing_image_prompt_and_vary_upscale: bool = Field(default=False,
                                                        description="Mixing Image Prompt and Vary/Upscale")
     mixing_image_prompt_and_inpaint: bool = Field(default=False,
-                                                   description="Mixing Image Prompt and Inpaint")
+                                                  description="Mixing Image Prompt and Inpaint")
     debugging_cn_preprocessor: bool = Field(default=False, description="Debug Preprocessors")
     skipping_cn_preprocessor: bool = Field(default=False, description="Skip Preprocessors")
     controlnet_softness: float = Field(default=0.25,
@@ -181,8 +181,8 @@ class CommonRequest(BaseModel):
                                 description="Specify whether the task is an asynchronous task")
     webhook_url: str | None = Field(default='',
                                     description="Optional URL for a webhook callback. If provided, "
-                                    "a POST request will be send to this URL upon task completion or failure."
-                                    " This allows for asynchronous notification of task status.")
+                                                "a POST request will be send to this URL upon task completion or failure."
+                                                " This allows for asynchronous notification of task status.")
 
 
 def style_selection_parser(style_selections: str) -> List[str]:
@@ -275,7 +275,6 @@ def outpaint_selections_parser(outpaint_selections: str) -> List[OutpaintExpansi
     return outpaint_selections_arr
 
 
-# todo: document not correct
 def image_prompt_parser(image_prompts_config: List[Tuple]) -> List[ImagePrompt]:
     """
     Image prompt parser, Convert to List[ImagePrompt]

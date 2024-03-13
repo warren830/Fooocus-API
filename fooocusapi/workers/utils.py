@@ -170,7 +170,7 @@ def determine_task_type(current_tab: str,
     return 'none'
 
 
-def process_uov(uov_method: bool, skip_prompt_processing: bool,
+def process_uov(uov_method: str, skip_prompt_processing: bool,
                 performance_selection: str, steps: int) -> tuple:
     """
     Process upscale or vary
@@ -208,9 +208,9 @@ def process_inpaint(inpaint_input_image: dict, inpaint_mask_image_upload,
 
     if ap.inpaint_mask_upload_checkbox:
         if isinstance(inpaint_mask_image_upload, np.ndarray):
-            if ap.ndim == 3:
+            if inpaint_mask_image_upload.ndim == 3:
                 height, width, channel = inpaint_image.shape
-                inpaint_mask_image_upload = resample_image(ap, width=width, height=height)
+                inpaint_mask_image_upload = resample_image(inpaint_mask_image_upload, width=width, height=height)
                 inpaint_mask_image_upload = np.mean(inpaint_mask_image_upload, axis=2)
                 inpaint_mask_image_upload = (inpaint_mask_image_upload > 127).astype(np.uint8) * 255
                 inpaint_mask = inpaint_mask_image_upload
@@ -276,7 +276,9 @@ def add_tasks(image_number: int, prompt: str, negative_prompt: str, seed: int,
               extra_positive_prompts: str, extra_negative_prompts: str,
               use_style: bool, style_selections: list) -> list[dict]:
     """
-    Add tasks to the list.
+    Add tasks to the list. this is use for process multiply image in one task.
+    for example, special image_number=10, program will put them in a list and process
+    them in a loop
     Args:
         image_number:
         prompt:

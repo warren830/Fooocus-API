@@ -1,17 +1,17 @@
 import asyncio
-import json
-import copy
+import os
 
 from fastapi import Response
+
 from fooocusapi.models.common.base import CommonRequest as Text2ImgRequest
 from fooocusapi.models.common.response import TaskResponse
-from fooocusapi.tasks.task_queue import task_queue
 from fooocusapi.tasks.task import TaskObj
-from fooocusapi.utils.img_utils import base64_to_bytesimg
+from fooocusapi.tasks.task_queue import task_queue
+from fooocusapi.utils.file_utils import output_dir
 
 
 async def call_worker(req: Text2ImgRequest,
-                      accept: str,) -> Response | TaskResponse:
+                      accept: str) -> Response | TaskResponse:
     """
     Call worker to generate image
     Args:
@@ -29,13 +29,20 @@ async def call_worker(req: Text2ImgRequest,
     task = TaskObj(req_params=req)
     await task_queue.add_task(task=task)
 
+    # if Accept is image/png, return image by bytes
     if streaming_output:
         while True:
             await asyncio.sleep(1)
             if task.task_status == 'success':
-                print(task)
                 try:
-                    image_bytes = base64_to_bytesimg(task.task_result[0].base64)
+                    filename = task.task_result[0].url.split('/')[-1]
+                    filedir = task.task_result[0].url.split('/')[-2]
+                    file_path = os.path.join(
+                        output_dir,
+                        filedir,
+                        filename
+                    )
+                    image_bytes = open(file_path, 'rb').read()
                     return Response(
                         image_bytes,
                         media_type="image/png",
@@ -45,6 +52,7 @@ async def call_worker(req: Text2ImgRequest,
             if task.task_status in ['failed', 'canceled']:
                 return task.to_dict()
 
+    # waiting for task finish, if async_process is false
     if not req.async_process:
         while True:
             print("waiting for sync task")

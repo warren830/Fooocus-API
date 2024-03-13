@@ -1,11 +1,12 @@
 """Fooocus API models for response"""
 from typing import List
+
 from pydantic import (
-    field_validator,
     BaseModel,
     ConfigDict,
     Field
 )
+
 from fooocusapi.models.common.task import (
     GeneratedImageResult, TaskType)
 
@@ -40,37 +41,11 @@ class TaskResponse(BaseModel):
     task_result: List[GeneratedImageResult] = Field(
         default=[], description="Task generation result")
 
-    # @field_validator("task_step_preview")
-    # def validate_task_step_preview(cls, v, value):
-    #     """When generation finished, remove task_step_preview"""
-    #     task_status = value.get("task_status")
-    #     if task_status == "success":
-    #         v = None
-    #     return v
-
-    # @field_validator("task_result")
-    # def validate_task_result(cls, v, value):
-    #     """
-    #     Unless specified require_base64=True, remove task_result base64 data
-    #     """
-    #     req_param = value.get("req_param")
-    #     require_base64 = req_param.get("require_base64", False)
-
-    #     if require_base64:
-    #         return v
-
-    #     result = []
-    #     if len(v) > 0:
-    #         for res in v:
-    #             v.base64 = None
-    #             result.append(res)
-    #     return result
-
 
 class JobQueueInfo(BaseModel):
     """Job queue info"""
     running: List[TaskResponse] = Field(description="The current running task")
-    pendding: List[TaskResponse] = Field(description="The current pending in the queue")
+    pending: List[TaskResponse] = Field(description="The current pending in the queue")
     finished: List[TaskResponse] = Field(description="Finished job")
 
 

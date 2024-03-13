@@ -72,7 +72,7 @@ class ImgUpscaleOrVaryRequest(Text2ImgRequest):
                                                    description="Advanced parameters in JSON"),
                 require_base64: bool = Form(default=False,
                                             description="Return base64 data of generated image"),
-                async_process: bool = Form(default=False,
+                async_process: bool = Form(default=True,
                                            description="Set to true will run async and return job info for retrieve generation result later")):
         style_selection_arr = style_selection_parser(style_selections)
         loras_model = lora_parser(loras)
@@ -105,9 +105,9 @@ class ImgInpaintOrOutpaintRequest(Text2ImgRequest):
     @classmethod
     def as_form(cls, input_image: UploadFile = Form(description="Init image for inpaint or outpaint"),
                 input_mask: UploadFile = Form(File(None), description="Inpaint or outpaint mask"),
-                inpaint_additional_prompt: str | None = Form(None,
+                inpaint_additional_prompt: str | None = Form(default=None,
                                                              description="Describe what you want to inpaint"),
-                outpaint_selections: List[str] = Form([],
+                outpaint_selections: List[str] = Form(default=[],
                                                       description="Outpaint expansion selections, literal 'Left', 'Right', 'Top', 'Bottom' separated by comma"),
                 outpaint_distance_left: int = Form(default=0,
                                                    description="Set outpaint left distance, -1 for default"),

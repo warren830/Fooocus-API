@@ -20,7 +20,7 @@ sys.path.append(module_path)
 from fooocusapi.utils.prepare import (
     prepare_environments,
     install_dependents,
-    preplaod_pipeline
+    preload_pipeline
 )
 
 
@@ -80,7 +80,7 @@ def pre_setup(disable_image_log: bool = False, skip_pip=False,
         sys.argv.append('--disable-image-log')
 
     install_dependents(args)
-    preplaod_pipeline()
+    preload_pipeline()
     prepare_environments(args, module_path, script_path)
 
     if load_all_models:
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         sys.argv = [sys.argv[0]]
 
         # Load pipeline in new thread
-        preload_pipeline_thread = Thread(target=preplaod_pipeline, daemon=True)
+        preload_pipeline_thread = Thread(target=preload_pipeline, daemon=True)
         preload_pipeline_thread.start()
 
         # Start api server

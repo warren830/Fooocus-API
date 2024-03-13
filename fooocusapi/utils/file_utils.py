@@ -83,7 +83,7 @@ def output_file_to_base64img(filename: str | None) -> str | None:
     output_buffer = BytesIO()
     img.save(output_buffer, format='PNG')
     byte_data = output_buffer.getvalue()
-    base64_str = base64.b64encode(byte_data)
+    base64_str = base64.b64encode(byte_data).decode('utf-8')
     return base64_str
 
 

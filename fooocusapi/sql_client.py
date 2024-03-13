@@ -4,9 +4,8 @@ import platform
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Integer, Float,VARCHAR, Boolean, JSON, Text, create_engine
+from sqlalchemy import Integer, Float, VARCHAR, Boolean, JSON, Text, create_engine
 from sqlalchemy.orm import declarative_base, Session, Mapped, mapped_column
-
 
 Base = declarative_base()
 
@@ -110,6 +109,7 @@ class GenerateRecord(Base):
                 upscale_value={self.upscale_value!r}, webhook_url={self.webhook_url!r}, require_base64={self.require_base64!r}, \
                 async_process={self.async_process!r})"
 
+
 engine = create_engine(connection_uri)
 
 session = Session(engine)
@@ -141,7 +141,6 @@ def convert_to_dict_list(obj_list: list[object]) -> dict:
     return dict_list
 
 
-
 class MysqlSQLAlchemy:
     def __init__(self, connection_uri: str):
         # 'mysql+pymysql://{username}:{password}@{host}:{port}/{database}'
@@ -156,9 +155,11 @@ class MysqlSQLAlchemy:
         """
         self.session.add_all([GenerateRecord(**record)])
         self.session.commit()
-    
-    def get_history(self, task_id: str=None, page: int=0, page_size: int=20,
-                    order_by: str='date_time') -> list:
+
+    def get_history(self, task_id: str = None,
+                    page: int = 0,
+                    page_size: int = 20,
+                    order_by: str = 'date_time') -> list:
         """
         Get history from database
         :param task_id:
@@ -169,7 +170,7 @@ class MysqlSQLAlchemy:
             if len(res) == 0:
                 return []
             return convert_to_dict_list(res)
-        
+
         res = self.session.query(GenerateRecord).order_by(getattr(GenerateRecord, order_by).desc()).offset(page * page_size).limit(page_size).all()
         if len(res) == 0:
             return []
@@ -177,6 +178,8 @@ class MysqlSQLAlchemy:
 
 
 db = MysqlSQLAlchemy(connection_uri=connection_uri)
+
+
 def req_to_dict(req: dict) -> dict:
     req["loras"] = [{"model_name": lora[0], "weight": lora[1]} for lora in req["loras"]]
     req["advanced_params"] = dict(zip(adv_params_keys, req["advanced_params"]))
@@ -190,6 +193,7 @@ def req_to_dict(req: dict) -> dict:
     del req["uov_input_image"]
     return req
 
+
 def add_history(params: dict, task_type: str, task_id: str, result_url: str, finish_reason: str) -> None:
     params = req_to_dict(params["params"])
     params["date_time"] = int(time.time())
@@ -201,5 +205,5 @@ def add_history(params: dict, task_type: str, task_id: str, result_url: str, fin
     db.store_history(params)
 
 
-def query_history(task_id: str=None, page: int=0, page_size: int=20, order_by: str="date_time") -> list:
+def query_history(task_id: str = None, page: int = 0, page_size: int = 20, order_by: str = "date_time") -> list:
     return db.get_history(task_id=task_id, page=page, page_size=page_size, order_by=order_by)

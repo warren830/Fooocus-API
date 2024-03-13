@@ -1,5 +1,5 @@
 from ldm_patched.modules.args_parser import parser
-# Apply Fooocus's args
+# Apply Fooocus args
 from args_manager import args_parser
 from fooocusapi.base_args import add_base_args
 

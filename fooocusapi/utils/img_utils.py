@@ -1,7 +1,5 @@
 """Image process utils. Used to verify, convert and store Images."""
 # pylint: disable=broad-exception-caught
-
-
 import base64
 from io import BytesIO
 
@@ -12,7 +10,22 @@ from fastapi import UploadFile
 from PIL import Image
 
 
-def narray_to_base64img(narray: np.ndarray) -> str:
+def upload_base64(image: UploadFile) -> str | None:
+    """
+    Convert UploadFile obj to base64 string
+    Args:
+        image (UploadFile): UploadFile obj
+    Returns:
+        str: base64 string, None for None
+    """
+    if image is None:
+        return None
+    image_bytes = image.file.read()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+    return image_base64
+
+
+def narray_to_base64img(narray: np.ndarray) -> str | None:
     """
     Convert numpy array to base64 image string.
     Args:
@@ -31,7 +44,7 @@ def narray_to_base64img(narray: np.ndarray) -> str:
     return base64_str
 
 
-def narray_to_bytesimg(narray: np.ndarray) -> bytes:
+def narray_to_bytesimg(narray: np.ndarray) -> bytes | None:
     """
     Convert numpy array to bytes image.
     Args:
@@ -49,19 +62,25 @@ def narray_to_bytesimg(narray: np.ndarray) -> bytes:
     return byte_data
 
 
-def read_input_image(input_image: UploadFile | None) -> np.ndarray | None:
+def read_input_image(input_image: UploadFile | str | None) -> np.ndarray | None:
     """
-    Read input image from UploadFile.
+    Read input image from UploadFile or base64 string.
     Args:
-        input_image: UploadFile
+        input_image: UploadFile, or base64 image string, or None
     Returns:
         numpy array of image
     """
     if input_image is None:
         return None
+    if isinstance(input_image, str):
+        input_image_bytes = base64.b64decode(input_image)
+        pil_image = Image.open(BytesIO(input_image_bytes))
+        image = np.array(pil_image)
+        return image
     input_image_bytes = input_image.file.read()
-    pil_image = Image.open(BytesIO(input_image_bytes))
-    image = np.array(pil_image)
+    image = np.frombuffer(input_image_bytes, np.uint8)
+    # pil_image = Image.open(BytesIO(input_image_bytes))
+    # image = np.array(pil_image)
     return image
 
 
@@ -158,3 +177,18 @@ def base64_to_bytesimg(base64_str: str) -> bytes | None:
         return None
     bytes_image = base64.b64decode(base64_str)
     return bytes_image
+
+
+def base64_to_narray(base64_str: str) -> np.ndarray | None:
+    """
+    Convert base64 image string to numpy array.
+    Args:
+        base64_str: base64 image string
+    Returns:
+        numpy array or None
+    """
+    if base64_str == '':
+        return None
+    bytes_image = base64.b64decode(base64_str)
+    image = np.frombuffer(bytes_image, np.uint8)
+    return image
