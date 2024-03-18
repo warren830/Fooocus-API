@@ -53,7 +53,7 @@ async def text_to_img_with_ip(
 
     req.image_prompts = image_prompts_files
 
-    return call_worker(req, accept)
+    return await call_worker(req, accept)
 
 
 @secure_router.post(
@@ -62,7 +62,7 @@ async def text_to_img_with_ip(
     responses=img_generate_responses,
     tags=['Generation endpoint V2']
 )
-def img_upscale_or_vary_v2(
+async def img_upscale_or_vary_v2(
         req: ImgUpscaleOrVaryRequestJson,
         accept: str = Header(None),
         accept_query: str | None = Query(
@@ -88,7 +88,7 @@ def img_upscale_or_vary_v2(
         image_prompts_files.append(default_image_prompt)
     req.image_prompts = image_prompts_files
 
-    return call_worker(req, accept)
+    return await call_worker(req, accept)
 
 
 @secure_router.post(
@@ -97,7 +97,7 @@ def img_upscale_or_vary_v2(
     responses=img_generate_responses,
     tags=['Generation endpoint V2']
 )
-def img_inpaint_or_outpaint_v2(
+async def img_inpaint_or_outpaint_v2(
         req: ImgInpaintOrOutpaintRequestJson,
         accept: str = Header(None),
         accept_query: str | None = Query(
@@ -123,7 +123,7 @@ def img_inpaint_or_outpaint_v2(
         image_prompts_files.append(default_image_prompt)
     req.image_prompts = image_prompts_files
 
-    return call_worker(req, accept)
+    return await call_worker(req, accept)
 
 
 @secure_router.post(

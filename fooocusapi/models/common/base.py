@@ -179,6 +179,7 @@ class CommonRequest(BaseModel):
     require_base64: bool = Field(default=False, description="Return base64 data of generated image")
     async_process: bool = Field(default=False,
                                 description="Specify whether the task is an asynchronous task")
+    save_extension: str = Field(default="png", description="Image type for out put, one of [png, jpg, webp]")
     webhook_url: str | None = Field(default='',
                                     description="Optional URL for a webhook callback. If provided, "
                                                 "a POST request will be send to this URL upon task completion or failure."

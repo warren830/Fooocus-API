@@ -40,14 +40,20 @@ def save_output_file(img: np.ndarray, image_meta: dict = None,
     filename = os.path.join(date_string, image_name + '.' + extension)
     file_path = os.path.join(output_dir, filename)
 
+    if extension not in ['png', 'jpg', 'webp']:
+        extension = 'png'
+
     if image_meta is None:
         image_meta = {}
 
-    meta = PngInfo()
-    meta.add_text("params", json.dumps(image_meta))
+    meta = None
+    if extension == 'png':
+        meta = PngInfo()
+        meta.add_text("params", json.dumps(image_meta))
 
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    Image.fromarray(img).save(file_path, pnginfo=meta, optimize=True)
+    Image.fromarray(img).save(file_path, format=extension,
+                              pnginfo=meta, optimize=True)
     return Path(filename).as_posix()
 
 

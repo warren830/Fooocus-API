@@ -75,6 +75,7 @@ def process_generate(self, params: ImageGenerationParams):
         aspect_ratios_selection = params.aspect_ratios_selection
         image_number = params.image_number
         image_seed = refresh_seed(seed_string=params.image_seed)
+        save_extension = params.save_extension
         sharpness = params.sharpness
         guidance_scale = params.guidance_scale
         base_model_name = params.base_model_name
@@ -649,7 +650,8 @@ def process_generate(self, params: ImageGenerationParams):
                     params['LoRAs'] = list_lora
                     # log(x, d) # Fooocus 原生保存函数
                     image_name = save_output_file(img=x, image_meta=params,
-                                                  image_name=self.task_id + '-' + str(current_task_id))
+                                                  image_name=self.task_id + '-' + str(current_task_id),
+                                                  extension=save_extension)
                     image_url = get_file_serve_url(image_name)
                     b64_img = None
                     if self.req_param.require_base64:

@@ -70,7 +70,7 @@ def read_input_image(input_image: UploadFile | str | None) -> np.ndarray | None:
     Returns:
         numpy array of image
     """
-    if input_image is None:
+    if input_image is None or input_image == '':
         return None
     if isinstance(input_image, str):
         input_image_bytes = base64.b64decode(input_image)

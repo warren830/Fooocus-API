@@ -12,11 +12,11 @@ from fooocusapi.models.common.base import (
 
 class ImagePromptJson(BaseModel):
     """Image prompt"""
-    cn_img: str | None = Field(None,
+    cn_img: str | None = Field(default=None,
                                description="Input image for image prompt as base64")
-    cn_stop: float | None = Field(0, ge=0, le=1,
+    cn_stop: float | None = Field(default=0, ge=0, le=1,
                                   description="Stop at for image prompt, 0 for default value")
-    cn_weight: float | None = Field(0, ge=0, le=2,
+    cn_weight: float | None = Field(default=0, ge=0, le=2,
                                     description="Weight for image prompt, 0 for default value")
     cn_type: ControlNetType = Field(default=ControlNetType.cn_ip,
                                     description="ControlNet type for image prompt")
@@ -25,7 +25,7 @@ class ImagePromptJson(BaseModel):
 class ImgUpscaleOrVaryRequestJson(Text2ImgRequest):
     """Image inpaint or outpaint request"""
     uov_method: UpscaleOrVaryMethod = "Upscale (2x)"
-    upscale_value: float | None = Field(1.0, ge=1.0, le=5.0,
+    upscale_value: float | None = Field(default=None, ge=1.0, le=5.0,
                                         description="Upscale custom value, 1.0 for default value")
     input_image: str = Field(description="Init image for upsacale or outpaint as base64")
     image_prompts: List[ImagePromptJson | ImagePrompt] = []
@@ -34,9 +34,9 @@ class ImgUpscaleOrVaryRequestJson(Text2ImgRequest):
 class ImgInpaintOrOutpaintRequestJson(Text2ImgRequest):
     """Image inpaint or outpaint request"""
     input_image: str = Field(description="Init image for inpaint or outpaint as base64")
-    input_mask: str | None = Field('',
+    input_mask: str | None = Field(default='',
                                    description="Inpaint or outpaint mask as base64")
-    inpaint_additional_prompt: str | None = Field('',
+    inpaint_additional_prompt: str | None = Field(default='',
                                                   description="Describe what you want to inpaint")
     outpaint_selections: List[OutpaintExpansion] = []
     outpaint_distance_left: int | None = Field(-1,
@@ -52,7 +52,7 @@ class ImgInpaintOrOutpaintRequestJson(Text2ImgRequest):
 
 class ImgPromptRequestJson(ImgInpaintOrOutpaintRequestJson):
     """Image prompt request"""
-    input_image: str | None = Field(None,
+    input_image: str | None = Field(default=None,
                                     description="Init image for inpaint or outpaint as base64")
     image_prompts: List[ImagePromptJson | ImagePrompt]
 

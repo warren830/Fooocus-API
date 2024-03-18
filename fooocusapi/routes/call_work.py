@@ -1,3 +1,6 @@
+"""
+Generative entry method
+"""
 import asyncio
 import os
 
@@ -55,9 +58,8 @@ async def call_worker(req: Text2ImgRequest,
     # waiting for task finish, if async_process is false
     if not req.async_process:
         while True:
-            print("waiting for sync task")
+            print("Waiting for sync task finish...")
             await asyncio.sleep(1)
-            print(task.task_status)
             if task.task_status is not None:
                 return task.to_dict()
     return task.to_dict()
