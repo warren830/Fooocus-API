@@ -79,7 +79,8 @@ def req_to_params(req: Text2ImgRequest) -> ImageGenerationParams:
     returns:
         ImageGenerationParams
     """
-
+    # Read the latest model list
+    config.update_all_model_names()
     # Check base_model_name
     if req.base_model_name in config.model_filenames:
         pass
