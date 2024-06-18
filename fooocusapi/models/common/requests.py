@@ -6,7 +6,7 @@ from pydantic import (
     ValidationError
 )
 
-from modules.config import (
+from repositories.Fooocus.modules.config import (
     default_sampler,
     default_scheduler,
     default_prompt,
@@ -26,7 +26,7 @@ from modules.config import (
     default_clip_skip
 )
 
-from modules.flags import clip_skip_max
+from repositories.Fooocus.modules.flags import clip_skip_max
 
 from fooocusapi.models.common.base import (
     PerformanceSelection,

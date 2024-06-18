@@ -48,7 +48,6 @@ file_formatter = ColoredFormatter(
     fmt="[%(asctime)s] %(levelname)-8s%(reset)s %(message)s",
     datefmt='%Y-%m-%d %H:%M:%S',
     reset=True,
-    no_color=True,
     style='%'
 )
 

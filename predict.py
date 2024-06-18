@@ -183,8 +183,8 @@ class Predictor(BasePredictor):
             description="ControlNet type for image prompt")
     ) -> Output:
         """Run a single prediction on the model"""
-        from modules import flags
-        from modules.sdxl_styles import legal_style_names
+        from repositories.Fooocus.modules import flags
+        from repositories.Fooocus.modules.sdxl_styles import legal_style_names
         from fooocusapi.worker import blocking_get_task_result, worker_queue
 
         base_model_name = default_base_model_name
